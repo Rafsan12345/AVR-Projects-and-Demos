@@ -1,0 +1,73 @@
+/*
+ * UART_printf_atmega64.c
+ *
+ * Created: 24-03-2019 18:21:16
+ * Author : HP
+ */
+
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdio.h>
+
+#define F_CPU 8000000UL  // Define CPU frequency as 8 MHz
+#define BAUD 9600        // Define desired baud rate
+#define UBRR_VALUE F_CPU/16/BAUD-1  // Calculate UBRR value for baud rate
+
+// Function to initialize USART0
+void uart_init(void) {
+    unsigned int ubrr_value = UBRR_VALUE;
+    UBRR0H = (unsigned char)(ubrr_value >> 8);  // Set the high byte of the UBRR
+    UBRR0L = (unsigned char)ubrr_value;         // Set the low byte of the UBRR
+
+    UCSR0B = (1 << RXEN0) | (1 << TXEN0);  // Enable receiver and transmitter
+    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);  // Set for 8 data bits, 1 stop bit, no parity
+}
+
+// Function to send a character via UART0
+void uart_transmit(unsigned char data) {
+    while (!(UCSR0A & (1 << UDRE0)));  // Wait until the transmit buffer is empty
+    UDR0 = data;                       // Load data into the UART data register
+}
+
+// Function to receive a character via UART0
+unsigned char uart_receive(void) {
+    while (!(UCSR0A & (1 << RXC0)));  // Wait until data is received
+    return UDR0;                      // Return the received data
+}
+
+// Function to transmit a string via UART0
+void uart_print(const char *str) {
+    while (*str) {
+        uart_transmit(*str++);
+    }
+}
+
+// Redirect `printf` to UART using `putchar`
+int uart_putchar(char ch, FILE *stream) {
+    if (ch == '\n') {
+        uart_transmit('\r');  // Carriage return before newline (for terminal compatibility)
+    }
+    uart_transmit(ch);        // Transmit the actual character
+    return 0;
+}
+
+// Set up a FILE structure for `printf` to work with UART
+FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
+
+int main(void) {
+    // Initialize UART0
+    uart_init();
+
+    // Redirect stdout to UART0 so `printf` can be used
+    stdout = &uart_output;
+
+    // Test with a message
+    printf("ATmega64 UART Initialized\n");
+    printf("Hello from ATmega64!\n");
+
+    while (1) {
+        // Continuously transmit the message via UART
+        printf("Sending data every second...\n");
+        _delay_ms(1000);  // Delay for 1 second
+    }
+}

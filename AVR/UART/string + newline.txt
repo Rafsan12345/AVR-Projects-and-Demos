@@ -1,0 +1,43 @@
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdio.h>
+#include <string.h>
+
+// Function to transmit a single character via UART
+void transmit(char a) {
+	// Wait until the data register is empty
+	while (!(UCSRA & (1 << UDRE)));
+	UDR = a;  // Load the character into the UART Data Register
+}
+
+// Redirect the printf output to UART
+int __io_putchar(char ch, FILE *f) {
+	// Check for newline character
+	if (ch == '\n') {
+		transmit('\r');  // Transmit carriage return before newline
+	}
+	transmit(ch);  // Transmit the actual character
+	return ch;
+}
+
+// Create a FILE structure for stdio
+FILE uart_output = FDEV_SETUP_STREAM(__io_putchar, NULL, _FDEV_SETUP_WRITE);
+
+int main() {
+	// Initialize UART communication
+	DDRD = (1 << PD1);  // Set PD1 (TX) as output
+	UCSRB = (1 << TXEN);  // Enable the transmitter
+	UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);  // Asynchronous mode, 8 data bits, 1 stop bit, no parity
+	UBRRH = 0x00;  // Set baud rate high byte (9600 bps for 8 MHz clock)
+	UBRRL = 0x33;  // Set baud rate low byte (9600 bps for 8 MHz clock)
+
+	// Bind the UART output to stdio
+	stdout = &uart_output;
+
+	// Print a string via UART using printf
+	printf("BANGLADESH\n");  // Will print "BANGLADESH" and move to the next line
+	printf("BANGLADESH\n");  // Ensure new line is tested again
+
+	while (1);  // Infinite loop
+}

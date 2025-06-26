@@ -1,0 +1,58 @@
+#define F_CPU 800000UL
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+void cmd(char a)
+{
+	PORTC = (a & 0xF0);
+	PORTD = 0x20;
+	_delay_ms(100);
+	PORTD = 0x00;
+
+	PORTC = ((a<<4) & 0xF0);
+	PORTD = 0x20;
+	_delay_ms(100);
+	PORTD = 0x00;
+}
+
+void data(char a)
+{
+	PORTC = (a & 0xF0);
+	PORTD = 0xA0;
+	_delay_ms(100);
+	PORTD = 0x80;
+
+	PORTC = ((a<<4) & 0xF0);
+	PORTD = 0xA0;
+	_delay_ms(100);
+	PORTD = 0x80;
+}
+
+void display(char *a)
+{
+	while((*a) != '\0')
+	{
+		data(*a);
+		a++;
+	}
+}
+
+int main()
+{
+	DDRC = 0xF0;
+	DDRD = 0xE0;
+	PORTC = 0x00;
+	PORTD = 0x00;
+	cmd(0x02);
+	cmd(0x28);
+	cmd(0x0E);
+	cmd(0x01);
+	cmd(0x80);
+	
+	display("Hello World");
+	cmd(0xC0);
+	display("Embedded Systems");
+	
+	while(1);
+}

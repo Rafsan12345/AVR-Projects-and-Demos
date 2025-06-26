@@ -1,0 +1,43 @@
+#define F_CPU 8000000UL
+
+#include <avr/io.h>
+#include <util/delay.h>
+
+void SPI_Master_Init()
+{
+	PORTB |= (1 << 4);        // Set SS high (inactive)
+	SPCR = 0x50;              // Enable SPI, set as Master
+	PORTB &= ~(1 << 4);       // Set SS low (active)
+}
+
+void SPI_Master_Tx(char a)
+{
+	SPDR = a;                 // Start transmission
+	while ((SPSR & 0x80) == 0); // Wait until transmission is complete (SPIF flag set)
+}
+
+char SPI_Master_Rx()
+{
+	while ((SPSR & 0x80) == 0); // Wait until reception is complete (SPIF flag set)
+	return SPDR;               // Return received data
+}
+
+int main()
+{
+	char a, b;
+	DDRB = 0xB0;              // Set PB4 (SS), PB5 (SCK), PB7 (MOSI) as output, PB6 (MISO) as input
+	DDRC = 0xFF;              // Set PORTC as output
+	DDRD = 0x00;              // Set PORTD as input
+	SPI_Master_Init();
+	
+	while (1)
+	{
+		a = 'A';             // Read input from PORTD
+		SPI_Master_Tx(a);     // Transmit data via SPI
+		_delay_ms(1000);      // 1 second delay
+		
+		b = SPI_Master_Rx();  // Receive data via SPI
+		PORTC = b;            // Output received data to PORTC
+		_delay_ms(1000);      // 1 second delay
+	}
+}

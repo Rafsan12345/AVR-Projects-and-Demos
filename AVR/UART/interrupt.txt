@@ -1,0 +1,60 @@
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+void cmd(char a) {
+	PORTC = a;
+	PORTD = 0x20;
+	_delay_ms(100);
+	PORTD = 0x00;
+}
+
+void data(char a) {
+	PORTC = a;
+	PORTD = 0xA0;
+	_delay_ms(100);
+	PORTD = 0x80;
+}
+
+void display(char *a) {
+	while((*a) != '\0') {
+		data(*a);
+		a++;
+	}
+}
+
+void transmit(char a) {
+	UDR = a;
+	while ((UCSRA & 0x40) == 0);
+	_delay_ms(100);
+}
+
+ISR(USART_RXC_vect) {
+	
+    data(UDR);
+	//transmit(UDR);
+}
+
+ISR(USART_TXC_vect) {
+	cmd(0x80); cmd(0x01);
+	
+}
+
+int main() {
+	DDRC = 0xFF; DDRD = 0xE2;
+	PORTC = 0x00; PORTD = 0x00;
+	UCSRA = 0x00; UCSRB = 0xD8; UCSRC = 0x06;
+	UBRRH = 0x00; UBRRL = 0x33;
+
+	cmd(0x38);
+	cmd(0x80);
+	cmd(0x01);
+	cmd(0x0E);
+	cmd(0x06);
+	
+	
+	sei();
+
+	while (1);
+}

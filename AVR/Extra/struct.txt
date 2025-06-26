@@ -1,0 +1,49 @@
+#include <stdio.h>
+
+// Define the wiz_NetInfo structure
+typedef struct {
+    unsigned char mac[6];  // MAC address (6 bytes)
+    unsigned char ip[4];   // IP address (4 bytes)
+    unsigned char sn[4];   // Subnet mask (4 bytes)
+    unsigned char gw[4];   // Gateway address (4 bytes)
+    unsigned char dns[4];  // DNS address (4 bytes)
+    int dhcp;              // DHCP setting (0 = static, 1 = dynamic)
+} wiz_NetInfo;
+
+// Enum for DHCP type (assuming 0 for static and 1 for dynamic)
+#define NETINFO_STATIC 0
+#define NETINFO_DYNAMIC 1
+
+// Main function
+int main(void) {
+    // Initialize the structure with the given values
+    wiz_NetInfo gWIZNETINFO = {
+        .mac = { 0x80, 0x34, 0x28, 0x74, 0xA5, 0xCB },  // MAC address
+        .ip  = { 192, 168, 2, 112 },                    // IP address
+        .sn  = { 255, 255, 255, 0 },                    // Subnet mask
+        .gw  = { 192, 168, 1, 1 },                      // Gateway address
+        .dns = { 8, 8, 8, 8 },                          // DNS address
+        .dhcp = NETINFO_STATIC                          // DHCP static
+    };
+
+    // Print the values to verify
+    printf("MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n",
+           gWIZNETINFO.mac[0], gWIZNETINFO.mac[1], gWIZNETINFO.mac[2],
+           gWIZNETINFO.mac[3], gWIZNETINFO.mac[4], gWIZNETINFO.mac[5]);
+
+    printf("IP Address: %d.%d.%d.%d\n",
+           gWIZNETINFO.ip[0], gWIZNETINFO.ip[1], gWIZNETINFO.ip[2], gWIZNETINFO.ip[3]);
+
+    printf("Subnet Mask: %d.%d.%d.%d\n",
+           gWIZNETINFO.sn[0], gWIZNETINFO.sn[1], gWIZNETINFO.sn[2], gWIZNETINFO.sn[3]);
+
+    printf("Gateway: %d.%d.%d.%d\n",
+           gWIZNETINFO.gw[0], gWIZNETINFO.gw[1], gWIZNETINFO.gw[2], gWIZNETINFO.gw[3]);
+
+    printf("DNS: %d.%d.%d.%d\n",
+           gWIZNETINFO.dns[0], gWIZNETINFO.dns[1], gWIZNETINFO.dns[2], gWIZNETINFO.dns[3]);
+
+    printf("DHCP: %s\n", gWIZNETINFO.dhcp == NETINFO_STATIC ? "Static" : "Dynamic");
+
+    return 0;
+}

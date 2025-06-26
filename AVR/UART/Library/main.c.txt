@@ -1,0 +1,20 @@
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdio.h>
+#include "uart.h"
+
+// Create a FILE structure for stdio
+FILE uart_output = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
+
+int main() {
+	// Initialize UART with a baud rate of 9600
+	uart_init(9600);
+	// Bind the UART output to stdio
+	stdout = &uart_output;
+	// Print a string via UART using printf
+	printf("BANGLADESH\n");
+	printf("Buet IICT\n");
+
+	while (1); // Infinite loop
+}

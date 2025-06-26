@@ -1,0 +1,73 @@
+#include <stdio.h>
+
+// Define two simple functions
+void function1() {
+    printf("This is function1.\n");
+}
+
+void function2() {
+    printf("This is function2.\n");
+}
+
+// Define the function that takes two functions as input
+void printFunctions(void (*f1)(), void (*f2)()) {
+    printf("Calling the first function:\n");
+    f1();  // Call the first function
+    printf("Calling the second function:\n");
+    f2();  // Call the second function
+}
+
+int main() {
+    // Pass function1 and function2 to printFunctions
+    printFunctions(function1, function2);
+    return 0;
+}
+
+
+
+
+
+#include <stdio.h>
+
+// Define some example control commands (enums or constants)
+#define CW_INIT_WIZCHIP 0x01
+#define CW_SET_MODE 0x02
+#define CW_RESET_CHIP 0x03
+
+// Function to handle the WIZCHIP control
+int ctlwizchip(int command) {
+    switch (command) {
+        case CW_INIT_WIZCHIP:
+            printf("Initializing WIZCHIP...\n");
+            // Add code to initialize the W5500 or any other chip
+            // Example: initialize network buffers, set MAC address, etc.
+            break;
+
+        case CW_SET_MODE:
+            printf("Setting WIZCHIP mode...\n");
+            // Set specific mode like MACRAW, PPPoE, etc.
+            break;
+
+        case CW_RESET_CHIP:
+            printf("Resetting WIZCHIP...\n");
+            // Reset the chip by sending reset signals or commands
+            break;
+
+        default:
+            printf("Unknown command.\n");
+            return -1;  // Return error code for unknown command
+    }
+
+    return 0;  // Return 0 for success
+}
+
+int main() {
+    // Call the control function with the CW_INIT_WIZCHIP command
+    if (ctlwizchip(CW_INIT_WIZCHIP) == 0) {
+        printf("WIZCHIP initialized successfully!\n");
+    } else {
+        printf("Failed to initialize WIZCHIP.\n");
+    }
+
+    return 0;
+}

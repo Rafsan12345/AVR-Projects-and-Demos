@@ -1,0 +1,22 @@
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(TIMER1_OVF_vect) {
+	PORTD ^= 0x01;    // Toggle PORTD pin 0 every 1 ms
+	TCNT1 = 0xFF83;   // Reload the timer for 1 ms delay
+}
+
+int main() {
+	DDRD = 0xFF;      // Set PORTD as output
+	PORTD = 0x00;     // Initialize PORTD to 0
+
+	TIMSK = (1 << TOIE1);  // Enable Timer1 overflow interrupt
+	TCCR1A = 0x00;         // Normal mode operation for Timer1
+	TCCR1B = (1 << CS11) | (1 << CS10);  // Prescaler = 64
+	TCNT1 = 0xFF83;        // Preload Timer1 to generate 1 ms interrupt
+
+	sei();                 // Enable global interrupts
+
+	while (1);             // Infinite loop
+}

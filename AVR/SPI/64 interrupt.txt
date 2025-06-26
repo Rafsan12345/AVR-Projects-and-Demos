@@ -1,0 +1,46 @@
+#define F_CPU 8000000UL  // Define clock frequency as 8 MHz
+
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+
+// SPI Interrupt Service Routine (Optional, can be used for debugging)
+ISR(SPI_STC_vect)
+{
+	// Empty ISR for now, can be used for debugging purposes
+	_delay_ms(100);  // Simulate some work in the ISR
+}
+
+// Function to initialize ATmega64 as SPI Master
+void SPI_Master_Init()
+{
+	// Set PB0 (SS), PB1 (SCK), PB2 (MOSI) as output, PB3 (MISO) as input
+	DDRB = (1 << PB0) | (1 << PB1) | (1 << PB2);
+	DDRB &= ~(1 << PB3);  // Set PB3 (MISO) as input
+
+	// Enable SPI, set as Master, set clock rate f_osc/16
+	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+	PORTB |= (1 << PB0);  // Set PB0 (SS) high (inactive)
+}
+
+// Function to transmit data via SPI
+void SPI_Master_Tx(char data)
+{
+	SPDR = data;                           // Load data into SPI Data Register
+	while (!(SPSR & (1 << SPIF)));         // Wait until transmission is complete (SPIF flag set)
+}
+
+// Main function to transmit ASCII 'A' periodically
+int main()
+{
+	// Initialize SPI in Master mode
+	SPI_Master_Init();
+	
+	while(1)
+	{
+		PORTB &= ~(1 << PB0);  // Set PB0 (SS) low (active)
+		SPI_Master_Tx('A');    // Transmit ASCII 'A' (which is 65)
+		PORTB |= (1 << PB0);   // Set PB0 (SS) high (inactive)
+		_delay_ms(1000);       // Wait for 1 second before sending again
+	}
+}

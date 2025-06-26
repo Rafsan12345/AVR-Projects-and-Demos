@@ -1,0 +1,62 @@
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdio.h>
+
+
+void cmd(char a) {
+	PORTC = a;
+	PORTD = 0x20;
+	_delay_ms(100);
+	PORTD = 0x00;
+}
+
+void data(char a) {
+	PORTC = a;
+	PORTD = 0xA0;
+	_delay_ms(100);
+	PORTD = 0x80;
+}
+
+void display(char *a) {
+	while((*a) != '\0') {
+		data(*a);
+		a++;
+	}
+}
+
+
+
+void int_display(int k)
+{
+		char str [10];
+	    sprintf(str, "%d", k);
+	    display(str);
+}
+
+
+
+int k = 255;
+
+char str[] ;
+
+
+
+int main() {
+	DDRA = 0xFF; DDRD = 0xE0;
+	PORTC = 0x00; PORTD = 0x00;
+	cmd(0x38); 
+	cmd(0x80); 
+	cmd(0x01);
+	cmd(0x0E); 
+	cmd(0x06);
+
+
+	sprintf(str, "Voltage =  %d V", k);
+	
+	display(str);
+
+
+	
+	while(1);
+}
