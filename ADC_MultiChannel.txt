@@ -1,0 +1,57 @@
+/*
+ * Project Title : ATmega32 - Multi-Channel ADC Example
+ * Description   : Read analog values from multiple ADC channels
+ *                 (e.g., ADC0 to ADC3) and store in variables.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - ADC (Section 15)
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+/* ---------------- ADC INIT ---------------- */
+void ADC_Init(void)
+{
+    // Reference voltage = AVCC, ADC Left Adjust Disabled
+    ADMUX = (1 << REFS0);   // REFS1=0, REFS0=1 → AVCC with external capacitor at AREF
+
+    // Enable ADC, Prescaler = 64 (F_CPU/64 = 125kHz)
+    ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1); 
+}
+
+/* ---------------- READ ADC CHANNEL ---------------- */
+uint16_t ADC_Read(uint8_t channel)
+{
+    // Select ADC channel (0-7)
+    ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
+
+    // Start conversion
+    ADCSRA |= (1 << ADSC);
+
+    // Wait for conversion to complete
+    while (ADCSRA & (1 << ADSC));
+
+    return ADC;  // 10-bit ADC result (0-1023)
+}
+
+/* ---------------- MAIN ---------------- */
+int main(void)
+{
+    ADC_Init();  // Initialize ADC
+
+    uint16_t adc0_value, adc1_value, adc2_value, adc3_value;
+
+    while (1)
+    {
+        // Read multi-channel ADC values
+        adc0_value = ADC_Read(0);  // ADC0 → PA0
+        adc1_value = ADC_Read(1);  // ADC1 → PA1
+        adc2_value = ADC_Read(2);  // ADC2 → PA2
+        adc3_value = ADC_Read(3);  // ADC3 → PA3
+
+        // Example: Small delay before next read
+        _delay_ms(100);
+    }
+}
