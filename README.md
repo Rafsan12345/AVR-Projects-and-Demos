@@ -39,4 +39,4 @@ Each project is fully commented and follows datasheet specifications and best en
 4. Connect the required hardware according to the project description.  
 5. Observe results (LEDs, Motor, LCD, Sensor readings, Serial Monitor, etc.).
 
-## Repository Structure (Example)
+
