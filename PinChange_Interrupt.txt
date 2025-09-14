@@ -1,0 +1,28 @@
+/*
+ * Project Title : ATmega32 - Pin Change Interrupt Example
+ * Description   : Button on PB0 toggles LED on PC0.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 11: Pin Change Interrupt
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(PCINT0_vect)
+{
+    PORTC ^= (1 << PC0);
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);    // PC0 output
+    DDRB &= ~(1 << PB0);   // PB0 input (button)
+
+    GICR |= (1 << PCIE);   // Enable pin change interrupt
+    PCMSK |= (1 << PCINT0);// Enable PCINT0 (PB0)
+    sei();
+
+    while (1) { }
+}

@@ -1,0 +1,60 @@
+/*
+ * Project Title : ATmega32 - External Interrupt INT0
+ * Description   : LED toggles when button connected to PD2 triggers falling edge.
+ * Datasheet Ref : Section 10: External Interrupts
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(INT0_vect)
+{
+    PORTC ^= (1 << PC0);
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);      // LED output
+    DDRD &= ~(1 << PD2);     // INT0 input
+
+    MCUCR |= (1 << ISC01);   // Falling edge
+    GICR |= (1 << INT0);     // Enable INT0
+    sei();
+
+    while (1) { }
+}
+……………………………………………………….
+
+
+
+
+
+
+
+/*
+ * Project Title : ATmega32 - External Interrupt INT1
+ * Description   : LED toggles when INT1 (PD3) rising edge detected.
+ * Datasheet Ref : Section 10: External Interrupts
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(INT1_vect)
+{
+    PORTC ^= (1 << PC0);
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);
+    DDRD &= ~(1 << PD3);
+
+    MCUCR |= (1 << ISC11) | (1 << ISC10); // Rising edge
+    GICR |= (1 << INT1);
+    sei();
+
+    while (1) { }
+}

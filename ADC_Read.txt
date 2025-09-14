@@ -1,0 +1,37 @@
+/*
+ * Project Title : ATmega32 - ADC Example
+ * Description   : Read analog input from ADC0 and display on PORTC.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 23: ADC
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+
+void ADC_Init(void)
+{
+    ADMUX = (1 << REFS0);              // AVcc reference
+    ADCSRA = (1 << ADEN) | (7 << ADPS0); // Enable ADC, prescaler 128
+}
+
+uint16_t ADC_Read(uint8_t ch)
+{
+    ch &= 0x07;
+    ADMUX = (ADMUX & 0xF8) | ch;
+    ADCSRA |= (1 << ADSC);
+    while (ADCSRA & (1 << ADSC));
+    return ADCW;
+}
+
+int main(void)
+{
+    DDRC = 0xFF;
+    ADC_Init();
+
+    while (1)
+    {
+        uint16_t val = ADC_Read(0);  // Read ADC0
+        PORTC = val >> 2;            // Display 8 MSBs on LEDs
+    }
+}

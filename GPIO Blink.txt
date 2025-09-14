@@ -1,0 +1,22 @@
+/*
+ * Project Title : ATmega32 - GPIO Example (LED Blink)
+ * Description   : Simple LED blink on PC0 using GPIO.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 14: I/O Ports
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void)
+{
+    DDRC |= (1 << PC0);   // Configure PC0 as Output
+
+    while (1) 
+    {
+        PORTC ^= (1 << PC0);  // Toggle LED
+        _delay_ms(500);       // Delay 500 ms
+    }
+}

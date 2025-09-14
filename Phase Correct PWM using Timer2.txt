@@ -1,0 +1,47 @@
+/*
+ * Project Title : ATmega32 - PWM using Timer2 (Phase Correct Mode)
+ * Description   : Generate PWM on OC2 (PD7).
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Timer2 Phase Correct PWM
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+void PWM_Timer2_Init(void)
+{
+    // Set OC2 (PD7) as Output
+    DDRD |= (1 << PD7);
+
+    // === Phase Correct PWM, Non-inverting ===
+    // WGM20=1, WGM21=0 → Phase Correct
+    // COM21=1 → Non-inverting
+    // CS21=1 → Prescaler = 8
+    TCCR2 = (1 << WGM20) | (1 << COM21) | (1 << CS21);
+
+    // Duty Cycle 25% initially
+    OCR2 = 64;
+}
+
+int main(void)
+{
+    PWM_Timer2_Init();
+
+    while (1)
+    {
+        // Increase brightness
+        for (uint8_t d = 0; d < 255; d++)
+        {
+            OCR2 = d;
+            _delay_ms(10);
+        }
+        // Decrease brightness
+        for (uint8_t d = 255; d > 0; d--)
+        {
+            OCR2 = d;
+            _delay_ms(10);
+        }
+    }
+}

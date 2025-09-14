@@ -1,0 +1,29 @@
+/*
+ * Project Title : ATmega32 - SPI Interrupt
+ * Description   : Data sent via SPI triggers interrupt.
+ * Datasheet Ref : Section 18: SPI
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(SPI_STC_vect)
+{
+    PORTC ^= (1 << PC0); // Indicate transfer complete
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);
+    DDRB |= (1 << PB5) | (1 << PB7) | (1 << PB4); // MOSI, SCK, SS
+
+    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPIE) | (1 << SPR0);
+    sei();
+
+    while (1)
+    {
+        SPDR = 0xAA; // Send data
+        for (volatile long i = 0; i < 100000; i++);
+    }
+}

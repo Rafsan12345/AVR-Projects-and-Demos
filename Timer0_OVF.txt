@@ -1,0 +1,24 @@
+/*
+ * Project Title : ATmega32 - Timer0 Overflow Interrupt
+ * Description   : LED toggles on Timer0 overflow.
+ * Datasheet Ref : Section 15: Timer/Counter0
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(TIMER0_OVF_vect)
+{
+    PORTC ^= (1 << PC0);
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);
+    TCCR0 = (1 << CS02) | (1 << CS00); // Prescaler 1024
+    TIMSK |= (1 << TOIE0);
+    sei();
+
+    while (1) { }
+}

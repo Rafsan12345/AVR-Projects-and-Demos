@@ -1,0 +1,23 @@
+/*
+ * Project Title : ATmega32 - Analog Comparator Interrupt
+ * Description   : Comparator triggers interrupt when AIN0 > AIN1.
+ * Datasheet Ref : Section 24: Analog Comparator
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(ANA_COMP_vect)
+{
+    PORTC ^= (1 << PC0);
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);
+    ACSR = (1 << ACIE); // Enable interrupt
+    sei();
+
+    while (1) { }
+}

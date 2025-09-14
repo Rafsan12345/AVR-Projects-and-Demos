@@ -1,0 +1,29 @@
+/*
+ * Project Title : ATmega32 - External Interrupt Example
+ * Description   : LED toggles on INT0 (PD2) falling edge.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 10: External Interrupts
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+ISR(INT0_vect)
+{
+    PORTC ^= (1 << PC0);   // Toggle LED on interrupt
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);        // PC0 output (LED)
+    DDRD &= ~(1 << PD2);       // PD2 input (INT0)
+
+    MCUCR |= (1 << ISC01);     // Falling edge INT0
+    GICR |= (1 << INT0);       // Enable INT0
+    sei();                     // Global interrupt enable
+
+    while (1) { }              // Wait for interrupt
+}

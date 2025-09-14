@@ -1,0 +1,26 @@
+/*
+ * Project Title : ATmega32 - ADC Interrupt
+ * Description   : Read ADC0 and update LED when conversion done.
+ * Datasheet Ref : Section 23: ADC
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(ADC_vect)
+{
+    PORTC = ADCH; // Display upper 8 bits
+    ADCSRA |= (1 << ADSC); // Start next conversion
+}
+
+int main(void)
+{
+    DDRC = 0xFF;
+    ADMUX = (1 << REFS0);  // AVcc ref
+    ADCSRA = (1 << ADEN) | (1 << ADIE) | (7 << ADPS0);
+    sei();
+    ADCSRA |= (1 << ADSC); // Start first conversion
+
+    while (1) { }
+}

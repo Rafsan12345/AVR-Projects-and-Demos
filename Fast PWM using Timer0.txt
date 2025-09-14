@@ -1,0 +1,41 @@
+/*
+ * Project Title : ATmega32 - PWM using Timer0 (Fast PWM Mode)
+ * Description   : Generate PWM on OC0 (PB3) with variable duty cycle.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Timer0 Fast PWM
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+void PWM_Timer0_Init(void)
+{
+    // Set OC0 (PB3) as Output
+    DDRB |= (1 << PB3);
+
+    // === Fast PWM Mode, Non-Inverting ===
+    // WGM00=1, WGM01=1 → Fast PWM
+    // COM01=1, COM00=0 → Non-inverting mode
+    // CS01=1           → Prescaler = 8
+    TCCR0 = (1 << WGM00) | (1 << WGM01) | (1 << COM01) | (1 << CS01);
+
+    // Initial Duty Cycle = 50%
+    OCR0 = 128;
+}
+
+int main(void)
+{
+    PWM_Timer0_Init();
+
+    while (1)
+    {
+        // Sweep duty cycle 0% → 100%
+        for (uint8_t duty = 0; duty < 255; duty++)
+        {
+            OCR0 = duty;    // Update duty cycle
+            _delay_ms(10);
+        }
+    }
+}

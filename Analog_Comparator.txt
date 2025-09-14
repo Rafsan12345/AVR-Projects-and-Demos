@@ -1,0 +1,24 @@
+/*
+ * Project Title : ATmega32 - Analog Comparator Example
+ * Description   : Comparator output drives LED on PC0.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 24: Analog Comparator
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+
+int main(void)
+{
+    DDRC |= (1 << PC0);       // PC0 output
+    ACSR = 0;                 // Enable comparator, use AIN0 vs AIN1
+
+    while (1)
+    {
+        if (ACSR & (1 << ACO))  // If AIN0 > AIN1
+            PORTC |= (1 << PC0);
+        else
+            PORTC &= ~(1 << PC0);
+    }
+}

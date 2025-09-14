@@ -1,0 +1,88 @@
+/*
+ * Project Title : ATmega32 - GPIO Full Demonstration
+ * Description   : Example code to show all GPIO operations
+ *                 (Output, Input, Pull-up, Pull-down, Toggle, Read).
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 13: I/O Ports
+ */
+
+#define F_CPU 8000000UL     // CPU Frequency: 8 MHz
+#include <avr/io.h>
+#include <util/delay.h>
+
+/* ---------------- FUNCTION DECLARATIONS ---------------- */
+void GPIO_Output(void);
+void GPIO_Input_NoPull(void);
+void GPIO_Input_PullUp(void);
+void GPIO_Toggle(void);
+
+/* ---------------------- MAIN ---------------------- */
+int main(void)
+{
+    // Example: Run all GPIO demonstrations in sequence
+    while (1)
+    {
+        GPIO_Output();        // LED ON/OFF with Output
+        _delay_ms(1000);
+
+        GPIO_Toggle();        // Toggle LED
+        _delay_ms(1000);
+
+        GPIO_Input_NoPull();  // Check Button (No Pull-up)
+        _delay_ms(1000);
+
+        GPIO_Input_PullUp();  // Check Button (Internal Pull-up)
+        _delay_ms(1000);
+    }
+}
+
+/* ---------------- FUNCTION DEFINITIONS ---------------- */
+
+// === 1. GPIO as OUTPUT ===
+// Example: LED on PC0
+void GPIO_Output(void)
+{
+    DDRC |= (1 << PC0);   // Set PC0 as Output
+    PORTC |= (1 << PC0);  // LED ON
+    _delay_ms(500);
+    PORTC &= ~(1 << PC0); // LED OFF
+}
+
+// === 2. GPIO as INPUT (Floating, No Pull-up) ===
+// Example: Button on PD0, LED on PC1
+void GPIO_Input_NoPull(void)
+{
+    DDRD &= ~(1 << PD0);  // PD0 as Input
+    PORTD &= ~(1 << PD0); // Disable Pull-up (Floating)
+
+    DDRC |= (1 << PC1);   // PC1 as Output (LED)
+
+    if (PIND & (1 << PD0))   // If button pressed (HIGH)
+        PORTC |= (1 << PC1); // LED ON
+    else
+        PORTC &= ~(1 << PC1); // LED OFF
+}
+
+// === 3. GPIO as INPUT with PULL-UP ===
+// Example: Button on PD1, LED on PC2
+void GPIO_Input_PullUp(void)
+{
+    DDRD &= ~(1 << PD1);  // PD1 as Input
+    PORTD |= (1 << PD1);  // Enable Internal Pull-up
+
+    DDRC |= (1 << PC2);   // PC2 as Output (LED)
+
+    if (!(PIND & (1 << PD1))) // If button pressed (LOW because of Pull-up)
+        PORTC |= (1 << PC2);  // LED ON
+    else
+        PORTC &= ~(1 << PC2); // LED OFF
+}
+
+// === 4. GPIO TOGGLE ===
+// Example: Toggle LED on PC3
+void GPIO_Toggle(void)
+{
+    DDRC |= (1 << PC3);   // PC3 as Output
+    PORTC ^= (1 << PC3);  // Toggle LED
+}

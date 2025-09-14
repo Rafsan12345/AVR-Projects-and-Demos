@@ -1,0 +1,25 @@
+/*
+ * Project Title : ATmega32 - Timer0 Compare Match Interrupt
+ * Description   : LED toggles when OCR0 matches.
+ * Datasheet Ref : Section 15: Timer/Counter0
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(TIMER0_COMP_vect)
+{
+    PORTC ^= (1 << PC0);
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);
+    TCCR0 = (1 << WGM01) | (1 << CS02) | (1 << CS00); // CTC, prescaler 1024
+    OCR0 = 124;
+    TIMSK |= (1 << OCIE0);
+    sei();
+
+    while (1) { }
+}

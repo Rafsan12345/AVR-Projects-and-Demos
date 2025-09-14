@@ -1,0 +1,35 @@
+/*
+ * Project Title : ATmega32 - Set PWM Frequency (Timer1 Fast PWM, ICR1 TOP)
+ * Description   : Generate exact 1 kHz PWM on OC1A (PD5) with variable duty cycle
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Timer1 Fast PWM with ICR1
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+
+void PWM_Timer1_Init(void)
+{
+    DDRD |= (1 << PD5);   // Set OC1A (PD5) as output
+
+    // Fast PWM, Mode 14: ICR1 is TOP
+    TCCR1A = (1 << WGM11) | (1 << COM1A1);
+    TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); // Prescaler = 8
+
+    // Set TOP for 1 kHz: ICR1 = (F_CPU / (N * f_PWM)) - 1
+    ICR1 = (F_CPU / (8 * 1000UL)) - 1;  // 8000/8/1000 -1 = 999
+
+    // Duty Cycle = 50%
+    OCR1A = ICR1 / 2;
+}
+
+int main(void)
+{
+    PWM_Timer1_Init();
+
+    while (1)
+    {
+        // PWM is hardware controlled
+    }
+}

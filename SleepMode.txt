@@ -1,0 +1,34 @@
+/*
+ * Project Title : ATmega32 - Sleep Mode Example
+ * Description   : MCU enters idle mode until interrupt.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 26: Power Management
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+
+ISR(INT0_vect)
+{
+    PORTC ^= (1 << PC0);  // Toggle LED
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);
+    DDRD &= ~(1 << PD2);
+
+    MCUCR |= (1 << ISC01); // Falling edge INT0
+    GICR |= (1 << INT0);
+    sei();
+
+    set_sleep_mode(SLEEP_MODE_IDLE);
+
+    while (1)
+    {
+        sleep_mode(); // Enter sleep until INT0 occurs
+    }
+}

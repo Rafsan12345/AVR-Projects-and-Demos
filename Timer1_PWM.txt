@@ -1,0 +1,24 @@
+/*
+ * Project Title : ATmega32 - Timer1 Fast PWM Example
+ * Description   : PWM output on OC1A (PD5).
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 16: Timer/Counter1
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+
+int main(void)
+{
+    DDRD |= (1 << PD5);   // OC1A output
+
+    // Fast PWM, Non-inverted, Prescaler = 64
+    TCCR1A = (1 << COM1A1) | (1 << WGM11);
+    TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11) | (1 << CS10);
+    
+    ICR1 = 1249;    // 50Hz PWM (for servo motor)
+    OCR1A = 94;     // ~7.5% duty cycle (servo neutral)
+
+    while (1) { }
+}

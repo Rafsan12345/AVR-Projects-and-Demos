@@ -1,0 +1,32 @@
+/*
+ * Project Title : ATmega32 - SPI Master Example
+ * Description   : Send data via SPI.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 18: SPI
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+
+void SPI_MasterInit(void)
+{
+    DDRB |= (1 << PB5) | (1 << PB7) | (1 << PB4); // MOSI, SCK, SS output
+    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0); // Enable, Master, f/16
+}
+
+void SPI_MasterTransmit(char data)
+{
+    SPDR = data;
+    while (!(SPSR & (1 << SPIF)));
+}
+
+int main(void)
+{
+    SPI_MasterInit();
+    while (1)
+    {
+        SPI_MasterTransmit(0xAA);
+        for (volatile long i = 0; i < 100000; i++);
+    }
+}

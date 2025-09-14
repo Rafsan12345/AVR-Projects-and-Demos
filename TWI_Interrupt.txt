@@ -1,0 +1,30 @@
+/*
+ * Project Title : ATmega32 - TWI Interrupt
+ * Description   : TWI operation completed with interrupt.
+ * Datasheet Ref : Section 21: TWI
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(TWI_vect)
+{
+    PORTC ^= (1 << PC0);
+    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWIE); // Clear flag
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);
+    TWSR = 0;
+    TWBR = 32;
+    TWCR = (1 << TWEN) | (1 << TWIE);
+    sei();
+
+    while (1)
+    {
+        TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN) | (1 << TWIE);
+        for (volatile long i = 0; i < 100000; i++);
+    }
+}

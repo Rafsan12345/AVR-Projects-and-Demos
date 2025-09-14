@@ -1,0 +1,27 @@
+/*
+ * Project Title : ATmega32 - USART RX Interrupt
+ * Description   : Echo back received data using interrupt.
+ * Datasheet Ref : Section 20: USART
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(USART_RXC_vect)
+{
+    char c = UDR;
+    while (!(UCSRA & (1 << UDRE)));
+    UDR = c; // Echo
+}
+
+int main(void)
+{
+    UBRRH = 0;
+    UBRRL = 51; // 9600 baud @ 8MHz
+    UCSRB = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
+    UCSRC = (1 << URSEL) | (3 << UCSZ0);
+    sei();
+
+    while (1) { }
+}

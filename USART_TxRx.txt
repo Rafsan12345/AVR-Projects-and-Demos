@@ -1,0 +1,40 @@
+/*
+ * Project Title : ATmega32 - USART Example
+ * Description   : UART Tx/Rx at 9600 baud.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 20: USART
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+
+void USART_Init(unsigned int ubrr)
+{
+    UBRRH = (unsigned char)(ubrr >> 8);
+    UBRRL = (unsigned char)ubrr;
+    UCSRB = (1 << RXEN) | (1 << TXEN);
+    UCSRC = (1 << URSEL) | (3 << UCSZ0);
+}
+
+void USART_Transmit(unsigned char data)
+{
+    while (!(UCSRA & (1 << UDRE)));
+    UDR = data;
+}
+
+unsigned char USART_Receive(void)
+{
+    while (!(UCSRA & (1 << RXC)));
+    return UDR;
+}
+
+int main(void)
+{
+    USART_Init(51); // 9600 baud @ 8MHz
+    while (1)
+    {
+        unsigned char r = USART_Receive();
+        USART_Transmit(r); // Echo
+    }
+}

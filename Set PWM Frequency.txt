@@ -1,0 +1,34 @@
+/*
+ * Project Title : ATmega32 - Set PWM Frequency (Timer0 Fast PWM)
+ * Description   : Generate 1 kHz PWM on OC0 (PB3) with 50% duty cycle
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Timer0 Fast PWM
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+
+void PWM_Timer0_Init(void)
+{
+    DDRB |= (1 << PB3);  // Set OC0 (PB3) as output
+
+    // Fast PWM, Non-inverting
+    TCCR0 = (1 << WGM00) | (1 << WGM01) | (1 << COM01);
+
+    // Select Prescaler = 8
+    TCCR0 |= (1 << CS01);
+
+    // Duty Cycle = 50%
+    OCR0 = 128;
+}
+
+int main(void)
+{
+    PWM_Timer0_Init();
+
+    while (1)
+    {
+        // PWM runs automatically in hardware
+    }
+}

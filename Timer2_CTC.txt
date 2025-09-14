@@ -1,0 +1,27 @@
+/*
+ * Project Title : ATmega32 - Timer2 CTC Example
+ * Description   : LED toggles at 1Hz using CTC mode.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 17: Timer/Counter2
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+ISR(TIMER2_COMP_vect)
+{
+    PORTC ^= (1 << PC0);
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);          // PC0 output
+    TCCR2 = (1 << WGM21) | (1 << CS22) | (1 << CS21) | (1 << CS20); // CTC, prescaler 1024
+    OCR2 = 124;   // Compare value for 1Hz toggle
+    TIMSK |= (1 << OCIE2);
+    sei();
+
+    while (1) { }
+}

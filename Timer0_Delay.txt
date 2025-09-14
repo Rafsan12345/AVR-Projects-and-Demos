@@ -1,0 +1,34 @@
+/*
+ * Project Title : ATmega32 - Timer0 Delay Example
+ * Description   : LED toggles every ~1s using Timer0 overflow.
+ * Author        : Your Name
+ * Date          : YYYY-MM-DD
+ * Datasheet Ref : ATmega32 Datasheet - Section 15: Timer/Counter0
+ */
+
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+volatile uint16_t overflow_count = 0;
+
+ISR(TIMER0_OVF_vect)
+{
+    overflow_count++;
+    if (overflow_count >= 31)   // ~1s at 8MHz, prescaler 1024
+    {
+        PORTC ^= (1 << PC0);
+        overflow_count = 0;
+    }
+}
+
+int main(void)
+{
+    DDRC |= (1 << PC0);          // PC0 output
+
+    TCCR0 = (1 << CS02) | (1 << CS00); // Prescaler 1024
+    TIMSK |= (1 << TOIE0);            // Enable overflow interrupt
+    sei();
+
+    while (1) { }
+}
